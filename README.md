@@ -11,7 +11,7 @@ The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as input
 
 ### Quickstart
 ```
-clusIBD -f ./example/random_100
+./bin/clusIBD -f ./example/random_100
 ```
 * `random_100`  is the  prefix of PLINK binary ped format. Make sure that random_100.bed, random_100.bim, and random_100.fam are all  in the same dictionary.
 * Because the prefix of output file is not specified, 'out' is used by default. Once finished, two files, namely 'out.IBD.details' and 'out.IBD.summary', will be generated at the present dictionary.
