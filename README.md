@@ -9,8 +9,9 @@ The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as input
 
 ### Quickstart
 
-clusIBD -f example -o test
-
+clusIBD -f ./example/example
+* `example`  is the  prefix of PLINK binary ped format. Make sure that example.bed, example.bim, and example.fam are in the dictionary.
+* Because the prefix of output file is not specified, 'out' is used by default. Once finished, two files, namely 'out.IBD.details' and 'out.IBD.summary', will be generated at the present dictionary.
 
 ### clusIBD Options:
 
@@ -52,7 +53,26 @@ clusIBD outputs two files, which are both a human-readable text format. The .det
   sample1 sample2	total_number	total_lengths (Mb)
 ```
 
-## License
 
-This project is licensed under the GPL-3.0 - see the [LICENSE](LICENSE) file for details
+##MIT License
+
+Copyright (c) 2024 Ryan620
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
