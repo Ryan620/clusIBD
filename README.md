@@ -1,15 +1,19 @@
 ###  clusIBD
+
  clusIBD is designed to  detect IBD segments  using unphased genetic data from challenging DNA samples. Two search modes are implemented, i.e. “within-search” and “across-search”. Within-search refers to inferring IBD segments for all the pairs within a database (one input file), whereas across-searching works by inferring IBD segments between two individuals from different databases (two input files). The latter is often performed when one or more individuals of interest are searched against a large database to identify potential relative. 
 
 ### Before running clusIBD
+
 The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as inputs. So  users should convert the input data (e.g. VCF files) into PLINK binary format.
   plink --vcf example.vcf  --double-id --make-bed --chr 1-22 --geno 0.5  --mind 0.5 --out  example
 
 ### Quickstart
+
 clusIBD -f example -o test
 
 
 ### clusIBD Options:
+
 * `-f` or `---file_prefix`
 	* The prefix of bed file. This is required.
 * `-F` or `--file_prefix_2`
@@ -37,6 +41,7 @@ clusIBD -f example -o test
 
 
 ###clusIBD output
+
 clusIBD outputs two files, which are both a human-readable text format. The .details file outputs all segments for each pair and the .summary file shows the total numbers and lengths of IBD segments for each pair.
 * .details file 
   sample1	sample2	chromosome	start	end	lengths (Mb)	IBD_type
