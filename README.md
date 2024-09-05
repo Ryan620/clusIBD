@@ -43,7 +43,7 @@ clusIBD -f ./example/random_100
 * `-o` or `--out`
 	*  The prefix of output file.If it is not specified,"out" is used.
 
-###clusIBD output
+### clusIBD output
 
 clusIBD outputs two files, which are both a human-readable text format. The .details file outputs all segments for each pair and the .summary file shows the total numbers and lengths of IBD segments for each pair.
 * .details file 
@@ -63,7 +63,7 @@ NC1m	NC7f	1	36.4197279
 NC1m	NC9m	11	589.610456
 ```
 
-###MIT License
+### MIT License
 
 Copyright (c) 2024 Ryan620
 
