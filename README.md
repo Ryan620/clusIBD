@@ -44,10 +44,13 @@ clusIBD -f example -o test
 
 clusIBD outputs two files, which are both a human-readable text format. The .details file outputs all segments for each pair and the .summary file shows the total numbers and lengths of IBD segments for each pair.
 * .details file 
+```
   sample1	sample2	chromosome	start	end	lengths (Mb)	IBD_type
-
+```
 *.summary file
+```
   sample1 sample2	total_number	total_lengths (Mb)
+```
 
 ## License
 
