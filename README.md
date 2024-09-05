@@ -4,10 +4,10 @@
 
 ### Before running clusIBD
 
-The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as inputs. So users should convert the input data (e.g. VCF files) into PLINK binary format. for example, you may use the following command line:
-'''
+The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as inputs. So users should convert the input data (e.g. VCF files) into PLINK binary format. For example, you may use the following command line:
+```
   plink --vcf example.vcf  --double-id --make-bed --chr 1-22 --geno 0.5  --mind 0.5 --out  example
-'''
+```
 
 ### Quickstart
 
@@ -53,7 +53,7 @@ NC10m	SP3m	2	44.149442	86.440963	42.291520	IBD1
 NC1m	NC4m	2	217.043942	240.662813	23.618871	IBD1
 NC1m	NC4m	4	61.609072	107.57351	45.964438	IBD1
 ```
-*.summary file
+* .summary file
 ```
 sample1 sample2	total_number	total_lengths (Mb)
 NC1m	NC4m	9	310.816892
@@ -62,7 +62,7 @@ NC1m	NC7f	1	36.4197279
 NC1m	NC9m	11	589.610456
 ```
 
-##MIT License
+###MIT License
 
 Copyright (c) 2024 Ryan620
 
