@@ -4,13 +4,15 @@
 
 ### Before running clusIBD
 
-The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as inputs. So  users should convert the input data (e.g. VCF files) into PLINK binary format.
+The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as inputs. So users should convert the input data (e.g. VCF files) into PLINK binary format. for example, you may use the following command line:
+'''
   plink --vcf example.vcf  --double-id --make-bed --chr 1-22 --geno 0.5  --mind 0.5 --out  example
+'''
 
 ### Quickstart
 
 clusIBD -f ./example/example
-* `example`  is the  prefix of PLINK binary ped format. Make sure that example.bed, example.bim, and example.fam are in the dictionary.
+* `example`  is the  prefix of PLINK binary ped format. Make sure that example.bed, example.bim, and example.fam are all  in the same dictionary.
 * Because the prefix of output file is not specified, 'out' is used by default. Once finished, two files, namely 'out.IBD.details' and 'out.IBD.summary', will be generated at the present dictionary.
 
 ### clusIBD Options:
@@ -40,19 +42,25 @@ clusIBD -f ./example/example
 * `-o` or `--out`
 	*  The prefix of output file.If it is not specified,"out" is used.
 
-
 ###clusIBD output
 
 clusIBD outputs two files, which are both a human-readable text format. The .details file outputs all segments for each pair and the .summary file shows the total numbers and lengths of IBD segments for each pair.
 * .details file 
 ```
-  sample1	sample2	chromosome	start	end	lengths (Mb)	IBD_type
+sample1	sample2	chr	start	end	lengths (Mb)	IBD_type
+NC10m	NC7f	2	53.715181	83.134022	29.418841	IBD1
+NC10m	SP3m	2	44.149442	86.440963	42.291520	IBD1
+NC1m	NC4m	2	217.043942	240.662813	23.618871	IBD1
+NC1m	NC4m	4	61.609072	107.57351	45.964438	IBD1
 ```
 *.summary file
 ```
-  sample1 sample2	total_number	total_lengths (Mb)
+sample1 sample2	total_number	total_lengths (Mb)
+NC1m	NC4m	9	310.816892
+NC1m	NE1m	1	24.9349800
+NC1m	NC7f	1	36.4197279
+NC1m	NC9m	11	589.610456
 ```
-
 
 ##MIT License
 
