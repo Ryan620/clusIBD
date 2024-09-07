@@ -18,7 +18,7 @@ The PLINK binary ped format (i.e., bed, bim, and fam files) is accepted as input
 
 ### clusIBD Options:
 
-* `-f` or `---file_prefix`
+* `-f` or `--file_prefix`
 	* The prefix of bed file. This is required.
 * `-F` or `--file_prefix_2`
 	* The prefix of another bed file.
