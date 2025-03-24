@@ -43,8 +43,8 @@ parser.add_argument('-s', '--size', default=5, type=int,
                     help='The random size for parameter estimation. The default is 5.')
 parser.add_argument('-L', '--IBD2_length', default=500, type=int,
                     help='The minimal length of IBD1 for IBD2 estimation. The default is 500.')
-parser.add_argument('-l', '--min_length', default=5, type=int,
-                    help='The minimal length for an IBD segment to be considered true. The default is 5.')
+parser.add_argument('-l', '--min_length', default=7, type=int,
+                    help='The minimal length for an IBD segment to be considered true. The default is 7.')
 parser.add_argument('-c', '--cpu', default=5, type=int, help='The number of CPU cores to be used. The default is 5.')
 parser.add_argument('-p', '--pairs_file', type=str,help='File containing sample pairs, each line represents a pair.')
 parser.add_argument('-o', '--out', default='out', type=str, metavar='',
