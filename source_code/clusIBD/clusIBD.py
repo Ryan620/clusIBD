@@ -134,7 +134,7 @@ def process_pair(sample_indices, type_id):
         '''
         #save the rates
         oph_rate = np.append(rate_array,threshold)
-        #if type_id == "IBD2": np.savetxt(f"./results/clusIBD_0_{sample_indices[0]}_{sample_indices[1]}.rate",oph_rate)
+        #
         if sample_indices[0] == 13 and sample_indices[1] == 29:
             np.savetxt(f"./results/clusIBD_0_{sample_indices[0]}_{sample_indices[1]}.rate",oph_rate)
             print(f"threshold is {threshold}")
@@ -267,7 +267,7 @@ with ProcessPoolExecutor(num_cpu) as executor:
 
             family_pair = (result_ibd2['family1'], result_ibd2['family2'])
 
-            # 更update summary_dict
+            # pdate summary_dict
             summary_dict[family_pair]['num_ibd_segments'] += result_ibd2['num_ibd_segments']
             summary_dict[family_pair]['total_ibd_length'] += result_ibd2['total_ibd_length']
 
