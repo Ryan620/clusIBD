@@ -9,7 +9,8 @@ def read_and_process_files(file_prefix, file_prefix_2=None, bin_size=-1, random_
 
     bim, fam, bed = pandas_plink.read_plink(file_prefix)
     all_samples_data = bed[:, :len(fam)].compute()
-    if (bim.iloc[:, 2] != 0).all():
+    #if (bim.iloc[:, 2] != 0).all():
+    if bim.iloc[:, 2].max() > 1:
         bim['pos'] = bim.iloc[:, 2]
     else:
         bim['pos'] = bim.iloc[:, 3] / 1000000
@@ -18,14 +19,15 @@ def read_and_process_files(file_prefix, file_prefix_2=None, bin_size=-1, random_
         all_samples_data_2 = bed_2[:, :len(fam_2)].compute()
     else:
         bim_2, fam_2, bed_2, all_samples_data_2 = None, None, None, None
-
+    #calculate the call rate for each sample
     call_rate_array = np.ones(fam.shape[0])
     for i in range(fam.shape[0]):
         genotypes = all_samples_data[:, i]
         nan_count = len(np.where(np.isnan(genotypes))[0])
         call_rate_array[i] = 1 - nan_count / bim.shape[0]
 
-    # init_bin
+    #the total length of the genome
+    #since the positions are sorted, the position larger the next one is the length for that chromosome
     #chromosomes = bim['chrom'].unique()
     shifted_pos = bim['pos'].shift(-1)
     condition = bim['pos'] > shifted_pos
@@ -37,7 +39,7 @@ def read_and_process_files(file_prefix, file_prefix_2=None, bin_size=-1, random_
     if bin_size < 0: bin_size = math.floor(9 * bim.shape[0] / (genome_len * 8))
     if bin_size < 150: bin_size = 150
 
-
+    #arrange windows
     groups_idx = pd.DataFrame(columns=['chr', 'groups', 'start_idx', 'end_idx'])
     total_n = 0
     group_start = [0] * 23
@@ -49,6 +51,9 @@ def read_and_process_files(file_prefix, file_prefix_2=None, bin_size=-1, random_
         start_indices = total_n + np.arange(0, len(chr_groups) * bin_size, bin_size)
         end_indices = np.append(start_indices[1:], total_n + n) - 1
         chrom = i
+        #print(chrom)
+        #print(chr_groups)
+        #print(end_indices)
         chr_df = pd.DataFrame({
             'chr': chrom,
             'groups': chr_groups,
@@ -77,11 +82,12 @@ def read_and_process_files(file_prefix, file_prefix_2=None, bin_size=-1, random_
     ##set the seed so that consistent rescults can be obtained for every sampling
     random.seed(random_size)
     num_samples = min(random_size, fam.shape[0])
-    sample_random = random.sample(range(fam.shape[0]), num_samples)
+    #sample_random = random.sample(range(fam.shape[0]), num_samples)
+    sample_random = range(num_samples)
     het_array = np.zeros((groups_idx.shape[0], len(sample_random)))
 
     snp_data_samples = all_samples_data[:, sample_random]
-    combined_ibs_states_samples = snp_data_samples == 1.0  # homozygote
+    combined_ibs_states_samples = snp_data_samples == 1.0  # 1.0 indicates heterozygote
 
     for j in range(groups_idx.shape[0]):
         idx1, idx2 = groups_idx.iloc[j, 2:4]

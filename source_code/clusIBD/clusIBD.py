@@ -59,9 +59,9 @@ if len(sys.argv) == 1:
 # Parse the command line arguments
 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 args = parser.parse_args()
-
 bin_size = args.bin_size
 IBD2_length = args.IBD2_length
+min_length = args.min_length
 minQ1 = args.minQ1
 minQ2 = args.minQ2
 num_cpu = args.cpu
@@ -70,7 +70,7 @@ out_file = args.out
 #if not os.path.exists(out_file):
 #    os.makedirs(out_file)
 #out_file = out_file+f"/{args.file_prefix.split('/')[-1]}_{timestamp}"
-# Call preprocessing
+# call preprocess
 start_time = time.time()
 (bim, fam, bed, all_samples_data, bim_2, fam_2, bed_2, all_samples_data_2, call_rate_array,
  groups_idx, group_start, groups_idx_dict, pos_list, het_vec, minQ01, minQ02, Q25, t1, t2,bin_size, total_windows,
@@ -86,7 +86,7 @@ results = {}
 
 num_samples_to_load = 10
 compare_two_files = False
-# for a list of specified sample pairs otherwise all pairs are analyzed in the dataset
+# read sample pairs that will be processed
 if args.pairs_file:
     sample_pairs = read_sample_pairs(args.pairs_file, fam, fam2=fam_2)
     print(f"Successfully read {len(sample_pairs)} sample pairs from {args.pairs_file}")
@@ -99,7 +99,8 @@ else:
 # if not args.pairs_file:
 #     print("no samples")
 invalid_pairs = []
-##function for detecting IBD for a pair of individuals
+
+##function for detecting IBD segments for each sample pair
 def process_pair(sample_indices, type_id):
     if compare_two_files:
         family1 = fam.iloc[sample_indices[0]]['iid']
@@ -116,7 +117,7 @@ def process_pair(sample_indices, type_id):
             snp_data_sample1 = all_samples_data[:, sample_indices[0]]
             snp_data_sample2 = all_samples_data[:, sample_indices[1]]
         combined_results = compare_snps_dask(snp_data_sample1, snp_data_sample2, type_id)
-        # calculate Rohg rate
+        # calculate rate
         for i in range(num_rows):
             start = start_indices_list[i]
             end = end_indices_list[i]
@@ -134,7 +135,7 @@ def process_pair(sample_indices, type_id):
         '''
         #save the rates
         oph_rate = np.append(rate_array,threshold)
-        #
+        #if type_id == "IBD2": np.savetxt(f"./results/clusIBD_0_{sample_indices[0]}_{sample_indices[1]}.rate",oph_rate)
         if sample_indices[0] == 13 and sample_indices[1] == 29:
             np.savetxt(f"./results/clusIBD_0_{sample_indices[0]}_{sample_indices[1]}.rate",oph_rate)
             print(f"threshold is {threshold}")
@@ -174,7 +175,7 @@ def process_pair(sample_indices, type_id):
                     try:
                         high = binary_search_adjusted_rate(chr_group_data, chr_num, current_group, previous_group,
                                                            2)
-                        end_idx = groups_idx_dict[chr_num][previous_group]['start_idx'] + 100
+                        end_idx = groups_idx_dict[chr_num][previous_group]['start_idx'] + math.floor(bin_size / 2)
                         end_pos = pos_list[end_idx + high - 1]
                     except (IndexError, KeyError) as e:
                         end_pos = pos_list[end_idx]
@@ -184,7 +185,9 @@ def process_pair(sample_indices, type_id):
 
 
                 if not pd.isna(start_pos):
-                    ibd_results_list.append(
+                #exclude short segments
+                    if (end_pos - start_pos) >= min_length:
+                        ibd_results_list.append(
                         {'family1': family1, 'family2': family2, 'chr': chr_num, 'start_pos': start_pos,
                          'end_pos': end_pos, 'lengths': end_pos - start_pos})
 
@@ -218,7 +221,7 @@ start_time = time.time()
 ibd2_pairs = []
 summary_dict = defaultdict(lambda: {'num_ibd_segments': 0, 'total_ibd_length': 0})
 
-# analyze IBD1 segments
+#detect IBD1 segments
 with ProcessPoolExecutor(num_cpu) as executor:
     future_to_pair = {executor.submit(process_pair, pair, 'IBD1'): pair for pair in sample_pairs}
     for future in tqdm(as_completed(future_to_pair), total=len(sample_pairs)):
@@ -234,20 +237,20 @@ with ProcessPoolExecutor(num_cpu) as executor:
                 print(f"No 'detail' in result for pair: {pair}")
                 continue
 
-            #  'detail'
+            #  'detail' valid results
             for detail in result['detail']:
                 detail['type'] = 'IBD1'
             results_details.extend(result['detail'])
 
             family_pair = (result['family1'], result['family2'])
 
-            # update summary_dict
+            # refresh summary_dict to IBD1
             summary_dict[family_pair]['num_ibd_segments'] += result['num_ibd_segments']
             summary_dict[family_pair]['total_ibd_length'] += result['total_ibd_length']
 
-            # if IBD segments are longer than predifined threshold, IBD2 is processed.
+            # if IBD will be analyzed, do not refresh summary
             if result['total_ibd_length'] > IBD2_length:
-                ibd2_pairs.append(pair)  # save the pairs for IBD2 detection
+                ibd2_pairs.append(pair)  #save the sampe pairs that will be processed for IBD2 detection
 
         except Exception as e:
             print(f"Error when processing pair {pair}: {e}")
@@ -255,7 +258,7 @@ with ProcessPoolExecutor(num_cpu) as executor:
 ibd1_end_time = time.time()
 print(f"IBD1 process time: {ibd1_end_time - start_time} seconds")
 
-# analyze IBD2 segments
+# detect IBD2 segments
 with ProcessPoolExecutor(num_cpu) as executor:
     future_to_pair = {executor.submit(process_pair, pair, 'IBD2'): pair for pair in ibd2_pairs}
     for future in tqdm(as_completed(future_to_pair), total=len(ibd2_pairs)):
@@ -267,11 +270,11 @@ with ProcessPoolExecutor(num_cpu) as executor:
 
             family_pair = (result_ibd2['family1'], result_ibd2['family2'])
 
-            # pdate summary_dict
+            # refresh summary_dict to IBD2
             summary_dict[family_pair]['num_ibd_segments'] += result_ibd2['num_ibd_segments']
             summary_dict[family_pair]['total_ibd_length'] += result_ibd2['total_ibd_length']
 
-            # 
+            # add the IBD2 results to details
             for detail in result_ibd2['detail']:
                 detail['type'] = 'IBD2'
             results_details.extend(result_ibd2['detail'])
@@ -283,14 +286,14 @@ ibd2_end_time = time.time()
 print(f"IBD2 process time: {ibd2_end_time - ibd1_end_time} seconds")
 print(f"Total process time: {ibd2_end_time - start_time} seconds")
 
-# save the resutls
+# save summary
 results = [f"{family1}\t{family2}\t{data['num_ibd_segments']}\t{data['total_ibd_length']}\n"
            for (family1, family2), data in summary_dict.items()]
 
 with open(f"{out_file}.IBD.summary", 'w') as file:
     file.writelines(results)
 
-# 
+# save details
 df_details = pd.DataFrame(results_details)
 df_details.to_csv(f"{out_file}.IBD.details", sep='\t', index=False, header=False)
 
